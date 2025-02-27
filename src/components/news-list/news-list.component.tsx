@@ -3,6 +3,19 @@ import { NewsContext } from "../../context/news.context";
 import NewsCard from "../news-card/news-card.component";
 import axios from "axios";
 import SkeletonComponent from "../skeleton/skeleton.component";
+interface NewsCardProps {
+	title: string;
+	description: string;
+	author: string;
+	content: string;
+	publishedAt: string;
+	source: {
+		id: string;
+		name: string;
+	};
+	url: string;
+	urlToImage: string;
+}
 
 export default function NewsList() {
 	const { news, setNews } = useContext(NewsContext);
@@ -23,12 +36,12 @@ export default function NewsList() {
 			.catch((error) => {
 				console.error(error);
 			});
-	}, []);
+	}, [setNews]);
 	return (
 		<>
-			<div className="grid lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 gap-3 w-full mt-10 mr-8 mb-4">
+			<div className="grid grid-cols-5 mx-4 col-span-12 gap-3">
 				{loading && skeleton}
-				{news.map((article: any, index: number) => (
+				{news.map((article: NewsCardProps, index: number) => (
 					<NewsCard key={index} {...article} />
 				))}
 			</div>

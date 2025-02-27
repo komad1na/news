@@ -1,5 +1,6 @@
 import { ExternalLink } from "lucide-react";
 import { Card, Image, Text, Badge, Button, Title } from "@mantine/core";
+import Demo from "../drawer/drawe.component";
 
 interface NewsCardProps {
 	title: string;
@@ -38,11 +39,11 @@ export default function NewsCard(props: NewsCardProps) {
 					className="mb-3"
 				/>
 				<Badge
-					color="red"
+					color="rgba(63, 102, 92, 1)"
 					styles={{
 						root: { position: "absolute", top: "10px", right: "10px" },
 					}}
-					radius="md"
+					radius="sm"
 					autoContrast
 				>
 					{new Date(publishedAt).toLocaleDateString("de-DE")}
@@ -67,7 +68,7 @@ export default function NewsCard(props: NewsCardProps) {
 						{author}
 					</Text>
 				</div>
-				<Button leftSection={<ExternalLink size={14} />} size="compact-md" className="my-2 mb-4" color="blue">
+				<Button leftSection={<ExternalLink size={14} />} size="compact-md" className="my-2 mb-4 mr-10" color="rgba(63, 102, 92, 1)">
 					<a
 						href={url}
 						target="_blank"
@@ -77,6 +78,7 @@ export default function NewsCard(props: NewsCardProps) {
 						Read more
 					</a>
 				</Button>
+				<Demo {...props}/>
 			</Card.Section>
 		</Card>
 	);

@@ -181,7 +181,7 @@ export default function Search() {
 	};
 
 	return (
-		<div className="flex flex-col gap-2 w-1/6 mt-10 ml-4">
+		<div className="flex flex-col gap-2 mx-3 col-span-3">
 			<h2 className="text-lg font-semibold">Search term</h2>
 			<Input
 				type="text"
@@ -192,7 +192,7 @@ export default function Search() {
 				w="100%"
 			/>
 
-			<Button onClick={onClick} disabled={loading} className="rounded dark:bg-accent">
+			<Button onClick={onClick} disabled={loading} color="rgba(63, 102, 92, 1)" className="rounded dark:bg-accent">
 				{loading ? (
 					<>
 						<Loader2 className="animate-spin" />
@@ -204,20 +204,31 @@ export default function Search() {
 			</Button>
 
 			<h2 className="text-lg font-semibold mt-2">Categories</h2>
+
 			{categories.map((category) => (
 				<Button
 					key={category.value}
 					onClick={() => handleCategories(category.value)}
 					disabled={loading || selectedCategory === category.value}
-					color={selectedCategory === category.value ? "gray" : "rgba(63, 102, 92, 1)"}
+					color={selectedCategory === category.value ? "red" : "rgba(63, 102, 92, 1)"}
 					size="compact-md"
 					leftSection={category.icon}
+					
+					className="text-white"
 					justify="start"
 				>
 					{category.name}
 				</Button>
 			))}
-			<Pagination size="sm" w="100%" siblings={1} total={Math.ceil(pages / 10)} onChange={(page) => handlePageChange(page)} value={page} />
+			<Pagination
+				size="sm"
+				w="100%"
+				siblings={1}
+				total={Math.ceil(pages / 10)}
+				onChange={(page) => handlePageChange(page)}
+				value={page}
+				color="rgba(63, 102, 92, 1)"
+			/>
 		</div>
 	);
 }
