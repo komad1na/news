@@ -3,27 +3,29 @@ import Header from "./components/header/header.component";
 import NewsList from "./components/news-list/news-list.component";
 import Search from "./components/search/search.component";
 import { NewsProvider } from "./context/news.context";
-import "@mantine/notifications/styles.css";
-import "@mantine/core/styles.css";
-import { MantineProvider } from "@mantine/core";
-import { Notifications } from "@mantine/notifications";
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { Snackbar, Alert } from '@mui/material';
+
+const theme = createTheme({
+	palette: {
+		primary: {
+			main: 'rgb(69, 100, 92)',
+		},
+	},
+});
 
 function App() {
 	return (
 		<>
-			<MantineProvider>
+			<ThemeProvider theme={theme}>
 				<NewsProvider>
 					<Header />
 					<div className="grid grid-cols-15 col-span-3 my-4">
 						<Search />
 						<NewsList />
-						
-						
 					</div>
 				</NewsProvider>
-				<Notifications position="top-right"/>
-			</MantineProvider>
-			
+			</ThemeProvider>
 		</>
 	);
 }

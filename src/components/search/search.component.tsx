@@ -1,8 +1,7 @@
 import axios from "axios";
 import { useContext, useState } from "react";
 import { NewsContext } from "../../context/news.context";
-import { Input, Pagination } from "@mantine/core";
-import { Button } from "@mantine/core";
+import { TextField, Pagination, Button, Snackbar, Alert } from "@mui/material";
 import {
 	Activity,
 	BriefcaseBusiness,
@@ -15,12 +14,16 @@ import {
 	Volleyball,
 	X,
 } from "lucide-react";
-import { notifications } from "@mantine/notifications";
 
 export default function Search() {
 	const [searchTerm, setSearchTerm] = useState("");
 	const { setNews } = useContext(NewsContext);
 	const [loading, setLoading] = useState(false);
+	const [notification, setNotification] = useState<{ open: boolean; message: string; severity: 'success' | 'error' | 'info'; loading?: boolean }>({
+		open: false,
+		message: '',
+		severity: 'info'
+	});
 	const apiKey: string = import.meta.env.VITE_NEWS_API as string;
 	const categories = [
 		{ name: "Business", value: "business", icon: <BriefcaseBusiness size={14} /> },
@@ -36,123 +39,89 @@ export default function Search() {
 	const [savedSeacrTerm, setSavedSearchTerm] = useState("");
 	const [page, setPage] = useState(1);
 
-	const handleChange = (event: { target: { value: React.SetStateAction<string> } }) => {
+	const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		setSearchTerm(event.target.value);
 		setSavedSearchTerm(event.target.value);
 	};
 
+	const showNotification = (message: string, severity: 'success' | 'error' | 'info', loading?: boolean) => {
+		setNotification({ open: true, message, severity, loading });
+	};
+
+	const handleCloseNotification = () => {
+		setNotification(prev => ({ ...prev, open: false }));
+	};
+
 	const onClick = () => {
 		if (!searchTerm) {
-			notifications.show({
-				title: "Error",
-				message: "Please enter a search term",
-				autoClose: 2000,
-				color: "red",
-				icon: <X />,
-			});
+			showNotification("Please enter a search term", "error");
 		} else {
 			setLoading(true);
-			notifications.show({
-				title: "Loading news",
-				message: "We are loading news for you, please wait",
-				autoClose: 2000,
-				loading: true,
-				icon: <Loader2 className="animate-spin" />,
-			});
+			showNotification("We are loading news for you, please wait", "info", true);
 			setSelectedCategory("");
 			axios
-				.get(`https://newsapi.org/v2/everything?q=${searchTerm}&pageSize=10`, {
+				.get(`https://newsapi.org/v2/everything?q=${searchTerm}&pageSize=30`, {
 					headers: { "X-Api-Key": apiKey },
 				})
 				.then((response) => {
 					setNews(response.data.articles);
 					setSearchTerm("");
-					notifications.clean();
-					notifications.show({
-						title: "Loaded news",
-						message: "We have loaded " + response.data.articles.length + " news for you",
-						autoClose: 2000,
-						loading: false,
-						icon: <SearchCheck />,
-						color: "green",
-					});
+					showNotification("We have loaded " + response.data.articles.length + " news for you", "success");
 					setPage(1);
 					setPages(response.data.totalResults);
 					setLoading(false);
 				})
 				.catch((error) => {
 					console.error(error);
+					showNotification("Error loading news", "error");
+					setLoading(false);
 				});
 		}
 	};
 
 	const handleCategories = (value: string) => {
 		setLoading(true);
-		notifications.show({
-			title: "Loading " + value + " news",
-			message: "We are loading " + value + " news for you, please wait",
-			autoClose: 2000,
-			loading: true,
-			icon: <Loader2 className="animate-spin" />,
-		});
+		showNotification("We are loading " + value + " news for you, please wait", "info", true);
 		axios
-			.get(`https://newsapi.org/v2/top-headlines?category=${value}&pageSize=10`, {
+			.get(`https://newsapi.org/v2/top-headlines?category=${value}&pageSize=30`, {
 				headers: { "X-Api-Key": apiKey },
 			})
 			.then((response) => {
 				setNews(response.data.articles);
 				setSelectedCategory(value);
 				setSearchTerm("");
-				notifications.clean();
-				notifications.show({
-					title: "Loaded " + value + " news",
-					message: "We have loaded " + response.data.articles.length + " news for you",
-					autoClose: 2000,
-					loading: false,
-					icon: <SearchCheck />,
-					color: "green",
-				});
+				showNotification("We have loaded " + response.data.articles.length + " news for you", "success");
 				setPages(response.data.totalResults);
 				setPage(1);
 				setLoading(false);
 			})
 			.catch((error) => {
 				console.error(error);
+				showNotification("Error loading news", "error");
+				setLoading(false);
 			});
 	};
 
-	const handlePageChange = (page: number) => {
+	const handlePageChange = (event: React.ChangeEvent<unknown>, page: number) => {
 		setLoading(true);
-		notifications.show({
-			title: "Loading page " + page + " news",
-			message: "We are loading page " + page + " news for you, please wait",
-			autoClose: 2000,
-			loading: true,
-			icon: <Loader2 className="animate-spin" />,
-		});
+		showNotification("We are loading page " + page + " news for you, please wait", "info", true);
 		setPage(page);
 		if (selectedCategory === "") {
 			axios
-				.get(`https://newsapi.org/v2/everything?q=${savedSeacrTerm}&pageSize=10&page=${page}`, {
+				.get(`https://newsapi.org/v2/everything?q=${savedSeacrTerm}&pageSize=30&page=${page}`, {
 					headers: { "X-Api-Key": apiKey },
 				})
 				.then((response) => {
 					setNews(response.data.articles);
 					setSearchTerm("");
-					notifications.clean();
-					notifications.show({
-						title: "Loaded page " + page + " news",
-						message: "We have loaded " + response.data.articles.length + " news for you",
-						autoClose: 2000,
-						loading: false,
-						icon: <SearchCheck />,
-						color: "green",
-					});
+					showNotification("We have loaded " + response.data.articles.length + " news for you", "success");
 					setLoading(false);
 					setPages(response.data.totalResults);
 				})
 				.catch((error) => {
 					console.error(error);
+					showNotification("Error loading news", "error");
+					setLoading(false);
 				});
 		} else {
 			axios
@@ -162,20 +131,14 @@ export default function Search() {
 				.then((response) => {
 					setNews(response.data.articles);
 					setSearchTerm("");
-					notifications.clean();
-					notifications.show({
-						title: "Loaded page " + page + " news",
-						message: "We have loaded " + response.data.articles.length + " news for you",
-						autoClose: 2000,
-						loading: false,
-						icon: <SearchCheck />,
-						color: "green",
-					});
+					showNotification("We have loaded " + response.data.articles.length + " news for you", "success");
 					setLoading(false);
 					setPages(response.data.totalResults);
 				})
 				.catch((error) => {
 					console.error(error);
+					showNotification("Error loading news", "error");
+					setLoading(false);
 				});
 		}
 	};
@@ -183,24 +146,24 @@ export default function Search() {
 	return (
 		<div className="flex flex-col gap-2 mx-3 col-span-3">
 			<h2 className="text-lg font-semibold">Search term</h2>
-			<Input
+			<TextField
 				type="text"
 				placeholder="Search"
 				value={searchTerm}
 				onChange={handleChange}
-				className="rounded text-black"
-				w="100%"
+				variant="outlined"
+				fullWidth
+				size="small"
 			/>
 
-			<Button onClick={onClick} disabled={loading} color="rgba(63, 102, 92, 1)" className="rounded dark:bg-accent">
-				{loading ? (
-					<>
-						<Loader2 className="animate-spin" />
-						Please wait
-					</>
-				) : (
-					"Search"
-				)}
+			<Button
+				variant="contained"
+				onClick={onClick}
+				disabled={loading}
+				color="primary"
+				startIcon={loading ? <Loader2 className="animate-spin" /> : null}
+			>
+				{loading ? "Please wait" : "Search"}
 			</Button>
 
 			<h2 className="text-lg font-semibold mt-2">Categories</h2>
@@ -210,25 +173,46 @@ export default function Search() {
 					key={category.value}
 					onClick={() => handleCategories(category.value)}
 					disabled={loading || selectedCategory === category.value}
-					color={selectedCategory === category.value ? "red" : "rgba(63, 102, 92, 1)"}
-					size="compact-md"
-					leftSection={category.icon}
-					
-					className="text-white"
-					justify="start"
+					variant="contained"
+					color={selectedCategory === category.value ? "error" : "primary"}
+					size="small"
+					startIcon={category.icon}
+					fullWidth
+					sx={{ justifyContent: 'flex-start' }}
 				>
 					{category.name}
 				</Button>
 			))}
 			<Pagination
-				size="sm"
-				w="100%"
-				siblings={1}
-				total={Math.ceil(pages / 10)}
-				onChange={(page) => handlePageChange(page)}
-				value={page}
-				color="rgba(63, 102, 92, 1)"
+				size="small"
+				count={Math.ceil(pages / 10)}
+				onChange={handlePageChange}
+				page={page}
+				color="primary"
+				sx={{ width: '100%', display: 'flex', justifyContent: 'center', mt: 2 }}
 			/>
+
+			<Snackbar
+				open={notification.open}
+				autoHideDuration={2000}
+				onClose={handleCloseNotification}
+				anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+			>
+				<Alert
+					onClose={handleCloseNotification}
+					severity={notification.severity}
+					sx={{ width: '100%' }}
+				>
+					{notification.loading ? (
+						<div className="flex items-center gap-2">
+							<Loader2 className="animate-spin" />
+							{notification.message}
+						</div>
+					) : (
+						notification.message
+					)}
+				</Alert>
+			</Snackbar>
 		</div>
 	);
 }

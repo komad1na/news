@@ -1,5 +1,5 @@
-import { Skeleton } from "@mantine/core";
+import { Skeleton } from "@mui/material";
 
 export default function SkeletonComponent() {
-	return <Skeleton height={450} radius="md" />;
+	return <Skeleton variant="rectangular" height={450} sx={{ borderRadius: 1 }} />;
 }

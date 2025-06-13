@@ -11,10 +11,11 @@
     "deploy": "tsc -b && vite build && gh-pages -d dist"
   },
   "dependencies": {
-    "@mantine/core": "^7.17.0",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
     "@mantine/dates": "^7.17.0",
-    "@mantine/hooks": "^7.17.0",
-    "@mantine/notifications": "^7.17.0",
+    "@mui/icons-material": "^7.1.1",
+    "@mui/material": "^7.1.1",
     "@tailwindcss/vite": "^4.0.8",
     "axios": "^1.7.9",
     "class-variance-authority": "^0.7.1",

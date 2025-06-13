@@ -1,7 +1,11 @@
 export default function Header() {
     return (
-        <div className="bg-zinc-300 relative top-0 p-4 grid-start-1 grid-end-1 grid-span-1">
-            <h1 className="text-4xl font-bold items-center text-black">News</h1>
-        </div>
+        <header className=" shadow-sm" style={{backgroundColor: 'rgb(69, 100, 92)'}}>
+            <div className="max-w-7xl mx-auto px-4 py-4">
+                <h1 className="text-3xl font-medium text-white">
+                    News
+                </h1>
+            </div>
+        </header>
     );
 }
