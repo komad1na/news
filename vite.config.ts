@@ -5,6 +5,7 @@ import tailwindcss from '@tailwindcss/vite'
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: '/news',
   plugins: [react(),tailwindcss()],
   resolve: {
     alias: {
@@ -12,3 +13,4 @@ export default defineConfig({
     },
   },
 })
+
