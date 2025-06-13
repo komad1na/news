@@ -2,6 +2,7 @@
   "name": "news",
   "private": true,
   "version": "0.0.0",
+  "homepage": "https://komad1na.github.io/news/",
   "type": "module",
   "scripts": {
     "dev": "vite",
