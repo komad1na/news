@@ -4,7 +4,6 @@ import NewsList from "./components/news-list/news-list.component";
 import Search from "./components/search/search.component";
 import { NewsProvider } from "./context/news.context";
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { Snackbar, Alert } from '@mui/material';
 
 const theme = createTheme({
 	palette: {

@@ -9,10 +9,8 @@ import {
 	Loader2,
 	Microscope,
 	Newspaper,
-	SearchCheck,
 	Tv,
 	Volleyball,
-	X,
 } from "lucide-react";
 
 export default function Search() {
@@ -101,7 +99,7 @@ export default function Search() {
 				setLoading(false);
 			});
 	};
-
+	//@ts-ignore
 	const handlePageChange = (event: React.ChangeEvent<unknown>, page: number) => {
 		setLoading(true);
 		showNotification("We are loading page " + page + " news for you, please wait", "info", true);

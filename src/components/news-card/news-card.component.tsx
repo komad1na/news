@@ -1,5 +1,5 @@
 import { ExternalLink } from "lucide-react";
-import { Card, CardMedia, CardContent, Typography, Box, Chip, Link } from "@mui/material";
+import { Card, CardMedia, Typography, Box, Chip, Link } from "@mui/material";
 
 interface NewsCardProps {
 	title: string;
