@@ -9,7 +9,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "deploy": "tsc -b && vite build && gh-pages -d dist"
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist -repo https://github.com/komad1na/news.git"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
