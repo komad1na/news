@@ -48,6 +48,8 @@ jobs:
         with:
           # Upload dist folder
           path: './dist'
+        env: # Or as an environment variable
+          VITE_NEWS_API: ${{ secrets.VITE_NEWS_API }}
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
