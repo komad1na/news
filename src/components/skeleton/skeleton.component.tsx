@@ -1,5 +1,10 @@
-import { Skeleton } from "@mui/material";
+import { Card, Skeleton } from "antd";
 
 export default function SkeletonComponent() {
-	return <Skeleton variant="rectangular" height={450} sx={{ borderRadius: 1 }} />;
+	return (
+		<Card style={{ borderRadius: '8px' }}>
+			<Skeleton.Image active style={{ width: '100%', height: 180 }} />
+			<Skeleton active paragraph={{ rows: 4 }} />
+		</Card>
+	);
 }

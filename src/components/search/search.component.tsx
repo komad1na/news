@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useContext, useState } from "react";
 import { NewsContext } from "../../context/news.context";
-import { TextField, Pagination, Button, Snackbar, Alert } from "@mui/material";
+import { Input, Pagination, Button, message, Card, Space, Typography, Divider } from "antd";
 import {
 	Activity,
 	BriefcaseBusiness,
@@ -11,17 +11,21 @@ import {
 	Newspaper,
 	Tv,
 	Volleyball,
+	Search as SearchIcon
 } from "lucide-react";
 
-export default function Search() {
+const { Title } = Typography;
+
+interface SearchProps {
+	darkMode: boolean;
+}
+
+export default function Search({ darkMode }: SearchProps) {
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const [searchTerm, setSearchTerm] = useState("");
 	const { setNews } = useContext(NewsContext);
 	const [loading, setLoading] = useState(false);
-	const [notification, setNotification] = useState<{ open: boolean; message: string; severity: 'success' | 'error' | 'info'; loading?: boolean }>({
-		open: false,
-		message: '',
-		severity: 'info'
-	});
+	const [messageApi, contextHolder] = message.useMessage();
 	const apiKey: string = import.meta.env.VITE_NEWS_API as string;
 	const categories = [
 		{ name: "Business", value: "business", icon: <BriefcaseBusiness size={14} /> },
@@ -42,12 +46,13 @@ export default function Search() {
 		setSavedSearchTerm(event.target.value);
 	};
 
-	const showNotification = (message: string, severity: 'success' | 'error' | 'info', loading?: boolean) => {
-		setNotification({ open: true, message, severity, loading });
-	};
-
-	const handleCloseNotification = () => {
-		setNotification(prev => ({ ...prev, open: false }));
+	const showNotification = (msg: string, type: 'success' | 'error' | 'info' | 'loading') => {
+		if (type === 'loading') {
+			messageApi.loading(msg, 0);
+		} else {
+			messageApi.destroy();
+			messageApi[type](msg);
+		}
 	};
 
 	const onClick = () => {
@@ -55,7 +60,7 @@ export default function Search() {
 			showNotification("Please enter a search term", "error");
 		} else {
 			setLoading(true);
-			showNotification("We are loading news for you, please wait", "info", true);
+			showNotification("We are loading news for you, please wait", "loading");
 			setSelectedCategory("");
 			axios
 				.get(`https://newsapi.org/v2/everything?q=${searchTerm}&pageSize=30`, {
@@ -68,6 +73,7 @@ export default function Search() {
 					setPage(1);
 					setPages(response.data.totalResults);
 					setLoading(false);
+					window.scrollTo({ top: 0, behavior: 'smooth' });
 				})
 				.catch((error) => {
 					console.error(error);
@@ -79,7 +85,7 @@ export default function Search() {
 
 	const handleCategories = (value: string) => {
 		setLoading(true);
-		showNotification("We are loading " + value + " news for you, please wait", "info", true);
+		showNotification("We are loading " + value + " news for you, please wait", "loading");
 		axios
 			.get(`https://newsapi.org/v2/top-headlines?category=${value}&pageSize=30`, {
 				headers: { "X-Api-Key": apiKey },
@@ -92,6 +98,7 @@ export default function Search() {
 				setPages(response.data.totalResults);
 				setPage(1);
 				setLoading(false);
+				window.scrollTo({ top: 0, behavior: 'smooth' });
 			})
 			.catch((error) => {
 				console.error(error);
@@ -99,10 +106,9 @@ export default function Search() {
 				setLoading(false);
 			});
 	};
-	//@ts-ignore
-	const handlePageChange = (event: React.ChangeEvent<unknown>, page: number) => {
+	const handlePageChange = (page: number) => {
 		setLoading(true);
-		showNotification("We are loading page " + page + " news for you, please wait", "info", true);
+		showNotification("We are loading page " + page + " news for you, please wait", "loading");
 		setPage(page);
 		if (selectedCategory === "") {
 			axios
@@ -115,6 +121,7 @@ export default function Search() {
 					showNotification("We have loaded " + response.data.articles.length + " news for you", "success");
 					setLoading(false);
 					setPages(response.data.totalResults);
+					window.scrollTo({ top: 0, behavior: 'smooth' });
 				})
 				.catch((error) => {
 					console.error(error);
@@ -132,6 +139,7 @@ export default function Search() {
 					showNotification("We have loaded " + response.data.articles.length + " news for you", "success");
 					setLoading(false);
 					setPages(response.data.totalResults);
+					window.scrollTo({ top: 0, behavior: 'smooth' });
 				})
 				.catch((error) => {
 					console.error(error);
@@ -142,75 +150,124 @@ export default function Search() {
 	};
 
 	return (
-		<div className="flex flex-col gap-2 mx-3 col-span-3">
-			<h2 className="text-lg font-semibold">Search term</h2>
-			<TextField
-				type="text"
-				placeholder="Search"
-				value={searchTerm}
-				onChange={handleChange}
-				variant="outlined"
-				fullWidth
-				size="small"
-			/>
-
-			<Button
-				variant="contained"
-				onClick={onClick}
-				disabled={loading}
-				color="primary"
-				startIcon={loading ? <Loader2 className="animate-spin" /> : null}
+		<div style={{ position: 'sticky', top: 20 }}>
+			{contextHolder}
+			<Card
+				bordered={false}
+				style={{
+					borderRadius: '8px',
+					boxShadow: darkMode ? '0 4px 12px rgba(0,0,0,0.3)' : '0 4px 12px rgba(0,0,0,0.08)',
+					overflow: 'hidden',
+					backgroundColor: darkMode ? '#1f1f1f' : '#ffffff'
+				}}
 			>
-				{loading ? "Please wait" : "Search"}
-			</Button>
+				<Space direction="vertical" size={20} style={{ width: '100%' }}>
+					{/* Search Section */}
+					<div>
+						<Title
+							level={5}
+							style={{
+								marginBottom: 12,
+								display: 'flex',
+								alignItems: 'center',
+								gap: 8,
+								color: darkMode ? '#ffffff' : undefined
+							}}
+						>
+							<SearchIcon size={18} style={{ color: darkMode ? '#ffffff' : undefined }} />
+							Search News
+						</Title>
+						<Input
+							type="text"
+							placeholder="Enter keywords..."
+							value={searchTerm}
+							onChange={handleChange}
+							size="large"
+							prefix={<SearchIcon size={16} style={{ color: '#8c8c8c' }} />}
+							style={{ borderRadius: '8px' }}
+							onPressEnter={onClick}
+						/>
+						<Button
+							type="primary"
+							onClick={onClick}
+							disabled={loading}
+							icon={loading ? <Loader2 className="animate-spin" size={16} /> : null}
+							block
+							size="large"
+							style={{
+								marginTop: 12,
+								borderRadius: '8px',
+								height: 44,
+								fontWeight: 600
+							}}
+						>
+							{loading ? "Searching..." : "Search"}
+						</Button>
+					</div>
 
-			<h2 className="text-lg font-semibold mt-2">Categories</h2>
+					<Divider style={{ margin: 0, borderColor: darkMode ? '#434343' : undefined }} />
 
-			{categories.map((category) => (
-				<Button
-					key={category.value}
-					onClick={() => handleCategories(category.value)}
-					disabled={loading || selectedCategory === category.value}
-					variant="contained"
-					color={selectedCategory === category.value ? "error" : "primary"}
-					size="small"
-					startIcon={category.icon}
-					fullWidth
-					sx={{ justifyContent: 'flex-start' }}
-				>
-					{category.name}
-				</Button>
-			))}
-			<Pagination
-				size="small"
-				count={Math.ceil(pages / 10)}
-				onChange={handlePageChange}
-				page={page}
-				color="primary"
-				sx={{ width: '100%', display: 'flex', justifyContent: 'center', mt: 2 }}
-			/>
+					{/* Categories Section */}
+					<div>
+						<Title
+							level={5}
+							style={{
+								marginBottom: 16,
+								display: 'flex',
+								alignItems: 'center',
+								gap: 8,
+								color: darkMode ? '#ffffff' : undefined
+							}}
+						>
+							<Newspaper size={18} style={{ color: darkMode ? '#ffffff' : undefined }} />
+							Browse Categories
+						</Title>
+						<Space direction="vertical" size={10} style={{ width: '100%' }}>
+							{categories.map((category) => (
+								<Button
+									key={category.value}
+									onClick={() => handleCategories(category.value)}
+									disabled={loading}
+									type={selectedCategory === category.value ? "primary" : "default"}
+									size="large"
+									icon={category.icon}
+									block
+									style={{
+										justifyContent: 'flex-start',
+										display: 'flex',
+										alignItems: 'center',
+										height: 44,
+										borderRadius: '8px',
+										fontWeight: selectedCategory === category.value ? 600 : 500,
+										backgroundColor: selectedCategory === category.value ? 'rgb(69, 100, 92)' : (darkMode ? '#141414' : 'transparent'),
+										borderColor: selectedCategory === category.value ? 'rgb(69, 100, 92)' : (darkMode ? '#434343' : '#d9d9d9'),
+										color: selectedCategory === category.value ? '#fff' : (darkMode ? '#ffffff' : 'rgba(0, 0, 0, 0.88)')
+									}}
+								>
+									{category.name}
+								</Button>
+							))}
+						</Space>
+					</div>
 
-			<Snackbar
-				open={notification.open}
-				autoHideDuration={2000}
-				onClose={handleCloseNotification}
-				anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-			>
-				<Alert
-					onClose={handleCloseNotification}
-					severity={notification.severity}
-					sx={{ width: '100%' }}
-				>
-					{notification.loading ? (
-						<div className="flex items-center gap-2">
-							<Loader2 className="animate-spin" />
-							{notification.message}
-						</div>
-					) : (
-						notification.message
+					{/* Pagination */}
+					{pages > 0 && (
+						<>
+							<Divider style={{ margin: 0 }} />
+							<div style={{ display: 'flex', justifyContent: 'center' }}>
+								<Pagination
+									size="small"
+									total={pages}
+									pageSize={10}
+									onChange={handlePageChange}
+									current={page}
+									showSizeChanger={false}
+								/>
+							</div>
+						</>
 					)}
-				</Alert>
-			</Snackbar>
+				</Space>
+			</Card>
 		</div>
 	);
 }

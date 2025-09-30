@@ -38,6 +38,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Build
+        env:
+          VITE_NEWS_API: ${{ secrets.VITE_NEWS_API }}
         run: npm run build
       - name: Setup Pages
         uses: actions/configure-pages@v5
